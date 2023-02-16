@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
+const authenticate = require("../middleware/authenticate");
 
 require("../db/conn");
 const User = require("../model/userSchema");
@@ -111,5 +112,51 @@ router.post("/signin", async (req, res) => {
     console.log(err);
   }
 });
+
+
+//for about us authentication
+router.get('/about',authenticate,(req, res) => {
+  console.log('Hello about World!');
+  res.send(req.rootUser);
+});
+
+//get user data for contact us and home page
+router.get('/getdata', authenticate, (req,res) =>{
+  console.log('Hello my about ');
+  res.send(req.rootUser);
+})
+
+//contact us page
+router.post('/contact', authenticate, async(req,res)=>{
+   try {
+
+    const {name, email, phone, message} = req.body;
+    
+
+    if(!name || !email || !phone || !message){
+      
+      console.log('Error in contact form');
+      return res.json({error:"Fill the contact form"});
+    }
+
+    const userContact = await User.findOne({_id:req.userID});
+    
+
+    if(userContact){
+      
+      const userMessage = await userContact.addMessage(name,email,phone,message);
+      console.log(userMessage);
+
+      await userContact.save();
+      res.status(201).json({message:"User contact successfully"});
+    }else {
+      // handle the case where userContact is null or undefined
+      console.log("User not found");
+      res.status(404).json({error:"User not found"});
+    }
+   } catch (error) {
+      console.log({error:"Error102"});
+   }
+})
 
 module.exports = router;
