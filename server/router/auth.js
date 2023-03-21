@@ -145,7 +145,7 @@ router.post('/contact', authenticate, async(req,res)=>{
     if(userContact){
       
       const userMessage = await userContact.addMessage(name,email,phone,message);
-      console.log(userMessage);
+      
 
       await userContact.save();
       res.status(201).json({message:"User contact successfully"});
@@ -157,6 +157,13 @@ router.post('/contact', authenticate, async(req,res)=>{
    } catch (error) {
       console.log({error:"Error102"});
    }
+});
+
+//Logout page
+router.get('/logout',(req,res)=>{
+    console.log('Hello my logout page');
+    res.clearCookie('jwtoken', {path:'/'})
+    res.status(200).send('User Logout')
 })
 
 module.exports = router;

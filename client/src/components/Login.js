@@ -1,7 +1,10 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { UserContext } from '../App';
 
 const Login = () => {
+
+  const {state, dispatch} = useContext(UserContext)
 
   const history = useNavigate();
 
@@ -27,6 +30,7 @@ const Login = () => {
     if(res.status===400 || !data){
       window.alert("Invalid credentials");
     }else{
+      dispatch({type:"USER", payload:true})
       window.alert("Login Successfully");
       history("/");
     }
